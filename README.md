@@ -27,7 +27,8 @@ devtools::install_github("zbig-karp/stat.alloc")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows you how to calculate meritocratic
+and lottery allocation for a given (observed) status allocation:
 
 ``` r
 library(stat.alloc)
@@ -85,6 +86,14 @@ Karpiński, Zbigniew, and John Skvoretz. 2023. “Status Allocation from
 Elementary Allocation Principles.” *Research in Social Stratification
 and Mobility* 83 (February): 100769.
 <https://doi.org/10.1016/j.rssm.2023.100769>.
+
+</div>
+
+<div id="ref-krauze1985" class="csl-entry">
+
+Krauze, Tadeusz, and Kazimierz M. Słomczyński. 1985. “How Far to
+Meritocracy? Empirical Tests of a Controversial Thesis.” *Social Forces*
+63: 623–42.
 
 </div>
 
