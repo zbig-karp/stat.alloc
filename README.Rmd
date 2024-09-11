@@ -1,0 +1,56 @@
+---
+output: github_document
+bibliography: /Users/zbigniewkarpinski/ReferencesMaster.bib
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# stat.alloc
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+stat.alloc is an R package with a set of functions which allow for calculating reference allocations for a given (observed) status allocation and use these reference allocations to estimate models in a family of status allocation models proposed in a series of publications by Zbigniew Karpiński and John Skvoretz [see @karpinski2023 for example]. Consider the original publications for details concerning the models.
+
+## Installation
+
+You can install the development version of stat.alloc from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("zbig-karp/stat.alloc")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(stat.alloc)
+
+# An example of a status allocation table reproduced from a seminal paper by Krauze and Słomczyński (1985). It shows counts of individual from a given educational category (row of the matrix) who end up in a given occupational status (column of the matrix).
+
+ks1985 <- matrix(
+  c(135, 52, 58, 12, 6, 
+    27, 56, 126, 26, 7, 
+    13, 51, 183, 98, 65, 
+    3, 8, 30, 23, 21), 
+  ncol = 4, dimnames = list(
+    rownames = paste0("$E_", 1:5, "$"), 
+    colnames = paste0("$O_", 1:4, "$")))
+
+# Reference status allocations 
+
+mar(ks1985)
+```
+
+# References
