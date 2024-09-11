@@ -27,8 +27,9 @@ devtools::install_github("zbig-karp/stat.alloc")
 
 ## Example
 
-This is a basic example which shows you how to calculate meritocratic
-and lottery allocation for a given (observed) status allocation:
+This is a basic example which shows you how to calculate
+**meritocratic** and **lottery** allocations from a given (observed)
+status allocation Karpiński and Skvoretz (2023):
 
 ``` r
 library(stat.alloc)

@@ -1,8 +1,6 @@
 ---
 output: github_document
 bibliography: /Users/zbigniewkarpinski/ReferencesMaster.bib
-nocite: |
-  @krauze1985
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -34,7 +32,7 @@ devtools::install_github("zbig-karp/stat.alloc")
 
 ## Example
 
-This is a basic example which shows you how to calculate meritocratic and lottery allocation for a given (observed) status allocation:
+This is a basic example which shows you how to calculate **meritocratic** and **lottery** allocations from a given (observed) status allocation [check @krauze1985 and @karpinski2023 for formal definitions of the various types of status allocation]:
 
 ```{r example}
 library(stat.alloc)
