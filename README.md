@@ -29,23 +29,44 @@ devtools::install_github("zbig-karp/stat.alloc")
 
 This is a basic example which shows you how to calculate
 **meritocratic** and **lottery** allocations from a given (observed)
-status allocation Karpiński and Skvoretz (2023):
+status allocation Karpiński and Skvoretz (2023).
+
+The code below defines an example of a status allocation table. The
+table is reproduced from a seminal paper by Krauze and Słomczyński
+(1985). It shows counts of individuals from a given educational category
+(row of the matrix) who end up in a given occupational status (column of
+the matrix):
 
 ``` r
-library(stat.alloc)
-
-# An example of a status allocation table reproduced from a seminal paper by Krauze and Słomczyński (1985). It shows counts of individual from a given educational category (row of the matrix) who end up in a given occupational status (column of the matrix).
-
 ks1985 <- matrix(
   c(135, 52, 58, 12, 6, 
     27, 56, 126, 26, 7, 
     13, 51, 183, 98, 65, 
     3, 8, 30, 23, 21), 
-  ncol = 4, dimnames = list(
-    rownames = paste0("$E_", 1:5, "$"), 
-    colnames = paste0("$O_", 1:4, "$")))
+  ncol = 4, dimnames = list(rownames = paste0("$E_", 1:5, "$"), 
+                            colnames = paste0("$O_", 1:4, "$")))
+```
 
-# Reference status allocations 
+Two **reference allocations** can be proposed for a given status
+allocation: a **meritocratic** allocation and a **lottery allocation**.
+Under the former, individuals are assigned to destination statuses based
+on their merits, so that those with the highest merits are the first to
+be assigned to the highest status. As a result, under perfectly
+meritocratic allocation, it is never the case that a person with lower
+merits ends up in higher destination status than a person with higher
+merits. Formally, the result of the fully meritocratic status allocation
+is defined as follows: $$
+m_{gh} = \min{\left(a_{g+} - \sum_{i=0}^{h-1}m_{gi},\,a_{+h} - \sum_{j=0}^{i-1} m_{jh}\right)},
+$$ where $m_{gh}$ is the number of individuals from education category
+$g$ who end up in occupational status $h$, $a_{g+}$ is the
+$g$<sup>th</sup> row marginal and $a_{+h}$ is the $h$th column marginal.
+Further, we set $m_{g0} = m_{0h} = 0$ for simplicity of expression.
+Allocation by this procedure insures that it is never the case that a
+person with lower credentials is found in a higher destination status
+than a person with higher credentials.
+
+``` r
+library(stat.alloc)
 
 mar(ks1985)
 #> $Actual
