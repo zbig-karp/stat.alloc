@@ -49,10 +49,20 @@ ks1985 <- matrix(
 
 Function `mar()` is used to calculate meritocratic and lottery allocations from a given one:
 
-```{r example}
+```{r example-1}
 library(stat.alloc)
 
 mar(ks1985)
+```
+
+Function `cmm_mde()` estimates a model which treats the observed status allocation as a mixture of two "pure" status allocation. It returns a list of three elements:
+
+- mixing coefficient, or the proportion of meritocracy in the mix,
+- model-predicted status allocation,
+- the index of dissimilarity between the observed and model-predicted allocations
+
+```{r example-2}
+cmm_mde(dat = mar(ks1985))
 ```
 
 # References

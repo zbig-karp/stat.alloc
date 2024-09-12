@@ -82,6 +82,34 @@ mar(ks1985)
 #>       E5  26.037 23.958  40.59  8.415
 ```
 
+Function `cmm_mde()` estimates a model which treats the observed status
+allocation as a mixture of two “pure” status allocation. It returns a
+list of three elements:
+
+- mixing coefficient, or the proportion of meritocracy in the mix,
+- model-predicted status allocation,
+- the index of dissimilarity between the observed and model-predicted
+  allocations
+
+``` r
+cmm_mde(dat = mar(ks1985))
+#> $`Mixing coefficient`
+#>    Estimate        S.E.   z test p value
+#> 1 0.4476211 0.002588898 172.9002 < 0.001
+#> 
+#> $`Model-predicted allocation`
+#>         colnames
+#> rownames        O1        O2        O3        O4
+#>       E1 105.53562  23.79427  40.31261  8.357493
+#>       E2  62.30883  59.02877  37.82138  7.841019
+#>       E3  57.67443 124.68863 195.99691 18.640026
+#>       E4  23.09883  21.25444 107.18133  7.465401
+#>       E5  14.38229  13.23389  28.68776 42.696061
+#> 
+#> $`Dissimilarity index`
+#> [1] 0.115597
+```
+
 # References
 
 <div id="refs" class="references csl-bib-body hanging-indent"

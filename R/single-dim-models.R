@@ -24,20 +24,19 @@ cmm_mde <- function(dat) {
   }
 
   # Minimising the distance between the observed and the model-predicted allocations
-  out <- optim(par = 0.9,
+  out <- optim(par = 0.5,
                fn = mc,
-               dat = dat,
-               method = "L-BFGS-B", lower = 0, upper = 1,
+               dat = mar(ks1985),
+               method = "L-BFGS-B", lower = 0 + 1e-5, upper = 1 - 1e-5,
                hessian = TRUE)
 
   est_table <- data.frame(
     Estimate = out$par,
-    `S.E.` = sqrt(1/out$hessian[1, 1]),
-    `z test` = Estimate/`S.E.`,
-    `p value` = pnorm(`z test`, lower.tail = F)
+    `S.E.` = sqrt(1/out$hessian[1, 1])
   )
-
-  est_table$`p value` <- cut(`p value`,
+  est_table$`z test` <- with(est_table, Estimate/`S.E.`)
+  est_table$`p value` <- with(est_table, pnorm(`z test`, lower.tail = FALSE))
+  est_table$`p value` <- cut(est_table$`p value`,
                              breaks = c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
                              labels = c("< 0.001", "< 0.0$", "< 0.05", "< 0.1", "n.s."))
 
