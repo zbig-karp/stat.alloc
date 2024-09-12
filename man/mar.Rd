@@ -21,6 +21,6 @@ A list of three matrices, each of the same order as \code{x}:
 Title
 }
 \examples{
-x <- matrix(c(10, 10, 0, 0, 0, 10, 20, 0, 0, 0, 20, 30), ncol = 4)
-mar(x)
+ks1985 <- matrix(c(135, 52, 58, 12, 6, 27, 56, 126, 26, 7, 13, 51, 183, 98, 65, 3, 8, 30, 23, 2), ncol = 4, dimnames = list(rownames = paste0("E", 1:5), colnames = paste0("O", 1:4)))
+mar(x = ks1985)
 }

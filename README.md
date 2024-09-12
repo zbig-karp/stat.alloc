@@ -27,15 +27,15 @@ devtools::install_github("zbig-karp/stat.alloc")
 
 ## Example
 
-This is a basic example which shows you how to calculate
-**meritocratic** and **lottery** allocations from a given (observed)
-status allocation Karpiński and Skvoretz (2023).
+This example walks through a calculation of **meritocratic** and
+**lottery** allocations from a given (observed) status allocation
+Karpiński and Skvoretz (2023) and uses the result to estimate a formal
+model of status allocation.
 
-The code below defines an example of a status allocation table. The
-table is reproduced from a seminal paper by Krauze and Słomczyński
-(1985). It shows counts of individuals from a given educational category
-(row of the matrix) who end up in a given occupational status (column of
-the matrix):
+We first set up a status allocation table. It shows counts of
+individuals from a given educational category (row of the matrix) who
+end up in a given occupational status \[column of the matrix; see Krauze
+and Słomczyński (1985) for the source of the data\]:
 
 ``` r
 ks1985 <- matrix(
@@ -43,31 +43,12 @@ ks1985 <- matrix(
     27, 56, 126, 26, 7, 
     13, 51, 183, 98, 65, 
     3, 8, 30, 23, 21), 
-  ncol = 4, dimnames = list(rownames = paste0("$E_", 1:5, "$"), 
-                            colnames = paste0("$O_", 1:4, "$")))
+  ncol = 4, dimnames = list(rownames = paste0("E", 1:5), 
+                            colnames = paste0("O", 1:4)))
 ```
 
-Two **reference allocations** can be proposed for a given status
-allocation: a **meritocratic** allocation and a **lottery allocation**.
-Under the former, individuals are assigned to destination statuses based
-on their merits, so that those with the highest merits are the first to
-be assigned to the highest status. As a result, under perfectly
-meritocratic allocation, it is never the case that a person with lower
-merits ends up in higher destination status than a person with higher
-merits. Formally, the result of the fully meritocratic status allocation
-is defined as follows:
-
-$$
-m_{gh} = \min{\left(a_{g+} - \sum_{i=0}^{h-1}m_{gi},\,a_{+h} - \sum_{j=0}^{i-1} m_{jh}\right)},
-$$
-
-where $m_{gh}$ is the number of individuals from education category $g$
-who end up in occupational status $h$, $a_{g+}$ is the $g$<sup>th</sup>
-row marginal and $a_{+h}$ is the $h$th column marginal. Further, we set
-$m_{g0} = m_{0h} = 0$ for simplicity of expression. Allocation by this
-procedure insures that it is never the case that a person with lower
-credentials is found in a higher destination status than a person with
-higher credentials.
+Function `mar()` is used to calculate meritocratic and lottery
+allocations from a given one:
 
 ``` r
 library(stat.alloc)
@@ -75,30 +56,30 @@ library(stat.alloc)
 mar(ks1985)
 #> $Actual
 #>         colnames
-#> rownames $O_1$ $O_2$ $O_3$ $O_4$
-#>    $E_1$   135    27    13     3
-#>    $E_2$    52    56    51     8
-#>    $E_3$    58   126   183    30
-#>    $E_4$    12    26    98    23
-#>    $E_5$     6     7    65    21
+#> rownames  O1  O2  O3 O4
+#>       E1 135  27  13  3
+#>       E2  52  56  51  8
+#>       E3  58 126 183 30
+#>       E4  12  26  98 23
+#>       E5   6   7  65 21
 #> 
 #> $Meritocratic
 #>         colnames
-#> rownames $O_1$ $O_2$ $O_3$ $O_4$
-#>    $E_1$   178     0     0     0
-#>    $E_2$    85    82     0     0
-#>    $E_3$     0   160   237     0
-#>    $E_4$     0     0   159     0
-#>    $E_5$     0     0    14    85
+#> rownames  O1  O2  O3 O4
+#>       E1 178   0   0  0
+#>       E2  85  82   0  0
+#>       E3   0 160 237  0
+#>       E4   0   0 159  0
+#>       E5   0   0  14 85
 #> 
 #> $Lottery
 #>         colnames
-#> rownames   $O_1$  $O_2$  $O_3$  $O_4$
-#>    $E_1$  46.814 43.076  72.98 15.130
-#>    $E_2$  43.921 40.414  68.47 14.195
-#>    $E_3$ 104.411 96.074 162.77 33.745
-#>    $E_4$  41.817 38.478  65.19 13.515
-#>    $E_5$  26.037 23.958  40.59  8.415
+#> rownames      O1     O2     O3     O4
+#>       E1  46.814 43.076  72.98 15.130
+#>       E2  43.921 40.414  68.47 14.195
+#>       E3 104.411 96.074 162.77 33.745
+#>       E4  41.817 38.478  65.19 13.515
+#>       E5  26.037 23.958  40.59  8.415
 ```
 
 # References

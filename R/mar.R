@@ -8,11 +8,12 @@
 #' - The first element of the list is the original status allocation matrix, `x`.
 #' - The second element of the list corresponds to a fully meritocratic status allocation, i.e., a status allocation which would be observed the allocation to destination statuses were driven solely by the principle of meritocracy, as defined by Krauze and Słomczyński (1985).
 #' - The third element of the list corresponds to a status allocation matrix which would be observed if the allocation to destination statuses were driven solely by lottery.
+#'
 #' @export
 #'
 #' @examples
-#' x <- matrix(c(10, 10, 0, 0, 0, 10, 20, 0, 0, 0, 20, 30), ncol = 4)
-#' mar(x)
+#' ks1985 <- matrix(c(135, 52, 58, 12, 6, 27, 56, 126, 26, 7, 13, 51, 183, 98, 65, 3, 8, 30, 23, 2), ncol = 4, dimnames = list(rownames = paste0("E", 1:5), colnames = paste0("O", 1:4)))
+#' mar(x = ks1985)
 mar <- function(x) {
   stopifnot("x must be a numeric matrix" = is.matrix(x),
             "x must be a numeric matrix" = is.numeric(x))
