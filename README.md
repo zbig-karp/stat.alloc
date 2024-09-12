@@ -55,15 +55,19 @@ be assigned to the highest status. As a result, under perfectly
 meritocratic allocation, it is never the case that a person with lower
 merits ends up in higher destination status than a person with higher
 merits. Formally, the result of the fully meritocratic status allocation
-is defined as follows: $$
+is defined as follows:
+
+$$
 m_{gh} = \min{\left(a_{g+} - \sum_{i=0}^{h-1}m_{gi},\,a_{+h} - \sum_{j=0}^{i-1} m_{jh}\right)},
-$$ where $m_{gh}$ is the number of individuals from education category
-$g$ who end up in occupational status $h$, $a_{g+}$ is the
-$g$<sup>th</sup> row marginal and $a_{+h}$ is the $h$th column marginal.
-Further, we set $m_{g0} = m_{0h} = 0$ for simplicity of expression.
-Allocation by this procedure insures that it is never the case that a
-person with lower credentials is found in a higher destination status
-than a person with higher credentials.
+$$
+
+where $m_{gh}$ is the number of individuals from education category $g$
+who end up in occupational status $h$, $a_{g+}$ is the $g$<sup>th</sup>
+row marginal and $a_{+h}$ is the $h$th column marginal. Further, we set
+$m_{g0} = m_{0h} = 0$ for simplicity of expression. Allocation by this
+procedure insures that it is never the case that a person with lower
+credentials is found in a higher destination status than a person with
+higher credentials.
 
 ``` r
 library(stat.alloc)
