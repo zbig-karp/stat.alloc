@@ -6,12 +6,15 @@ bibliography: /Users/zbigniewkarpinski/ReferencesMaster.bib
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
+library(tidyverse)
+library(knitr)
+opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+options(digits = 2)
 ```
 
 # stat.alloc
@@ -55,6 +58,8 @@ library(stat.alloc)
 mar(ks1985)
 ```
 
+## Constant mixing models
+
 Function `cmm_mde()` estimates a model which treats the observed status allocation as a mixture of two "pure" status allocation. It returns a list of three elements:
 
 - mixing coefficient, or the proportion of meritocracy in the mix,
@@ -63,6 +68,38 @@ Function `cmm_mde()` estimates a model which treats the observed status allocati
 
 ```{r example-2}
 cmm_mde(dat = mar(ks1985))
+```
+
+`cmm_mde()` estimates the mixing coefficient by searching for a value of the coefficient which minimises the distance (or the Frobenius norm of the difference) between the observed and model-predicted status allocations. An alternative, a function called `cmm_mle`, estimates the coefficient by means of maximum likelihood. 
+
+```{r example-3}
+cmm_mle(dat = mar(ks1985))
+```
+
+As we can see, the maximum-likelihood estimate is slightly lower than the minimum-distance one and it has a considerably larger standard error. In terms of fit, as measured with the dissimilarity index, the two estimations are nearly identical, but their predicted counts differ slightly. The index of dissimilarity between the two model-predicted allocations is:
+
+```{r}
+pred_mde <- prop.table(cmm_mde(dat = mar(ks1985))[[2]])
+pred_mle <- prop.table(cmm_mle(dat = mar(ks1985))[[2]])
+sum(abs(pred_mde - pred_mle))/2
+```
+
+Thus, `r round(1000 * sum(abs(pred_mde - pred_mle))/2)` cases (individuals) out of 1,000 have to be re-allocated to equalise the two matrices. It's not much in absolute terms, but it still shows that the two predictions differ.
+
+## Differential mixing models
+
+So far, the mixing coefficient was assumed to be constant across all origin categories. It is possible to relax this assumption and allow each origin category to have its own mixing coefficient. Function `dmm_mde()` fits a **differential mixing model** using the minimum distance estimation routine:
+
+```{r example-4}
+dmm_mde(dat = mar(ks1985))
+```
+
+The object returned by `dmm_mde` has a structure similar to those returned by `cmm_mde` or `cmm_mle`. A primary difference is that `dmm_mde` returns a list of four, rather than three, elements, the additional element being a named numeric vector of so-called adjustment proportions, or a special type of parameter introduced into the model to fit the column marginals [see @karpinski2023 for more details concerning the adjustment proportions].
+
+There is also a function which fits the differential model by means of maximum likelihood estimation, `dmm_mle()`. 
+
+```{r example-5}
+dmm_mle(dat = mar(ks1985))
 ```
 
 # References
