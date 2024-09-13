@@ -30,15 +30,13 @@ cmm_mde <- function(dat) {
                method = "L-BFGS-B", lower = 0 + 1e-5, upper = 1 - 1e-5,
                hessian = TRUE)
 
-  est_table <- data.frame(
+  est_table <- tibble::tibble(
     Estimate = out$par,
-    `S.E.` = sqrt(1/out$hessian[1, 1])
-  )
-  est_table$`z test` <- with(est_table, Estimate/`S.E.`)
-  est_table$`p value` <- with(est_table, pnorm(`z test`, lower.tail = FALSE))
-  est_table$`p value` <- cut(est_table$`p value`,
-                             breaks = c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
-                             labels = c("< 0.001", "< 0.0$", "< 0.05", "< 0.1", "n.s."))
+    `S.E.` = sqrt(1/out$hessian[1, 1]),
+    `z test` = Estimate/`S.E.`,
+    `p value` = cut(pnorm(`z test`, lower.tail = FALSE),
+                    breaks = c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+                    labels = c("< 0.001", "< 0.0$", "< 0.05", "< 0.1", "n.s.")))
 
   aprime <- out$par * dat$Meritocratic + (1 - out$par) * dat$Lottery
 
