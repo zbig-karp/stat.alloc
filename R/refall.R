@@ -12,9 +12,10 @@
 #' @export
 #'
 #' @examples
-#' ks1985 <- matrix(c(135, 52, 58, 12, 6, 27, 56, 126, 26, 7, 13, 51, 183, 98, 65, 3, 8, 30, 23, 2), ncol = 4, dimnames = list(rownames = paste0("E", 1:5), colnames = paste0("O", 1:4)))
-#' mar(x = ks1985)
-mar <- function(x) {
+#' data(ks1985)
+#' t1 <- xtabs(freq ~ degree + status, data = ks1985)
+#' refall(x = t1)
+refall <- function(x) {
   stopifnot("x must be a numeric matrix" = is.matrix(x),
             "x must be a numeric matrix" = is.numeric(x))
   x <- x[rowSums(x) > 0, colSums(x) > 0]
