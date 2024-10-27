@@ -1,6 +1,7 @@
 ---
 output: github_document
 bibliography: /Users/zbigniewkarpinski/ReferencesMaster.bib
+link-citations: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -8,13 +9,14 @@ bibliography: /Users/zbigniewkarpinski/ReferencesMaster.bib
 ```{r, include = FALSE}
 library(tidyverse)
 library(knitr)
+library(kableExtra)
 opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
-options(digits = 2)
+options(digits = 3)
 ```
 
 # stat.alloc
@@ -23,7 +25,15 @@ options(digits = 2)
 
 <!-- badges: end -->
 
-stat.alloc is an R package with a set of functions which allow for calculating reference allocations for a given (observed) status allocation and use these reference allocations to estimate models in a family of status allocation models proposed in a series of publications by Zbigniew Karpiński and John Skvoretz [see @karpinski2023 for example]. Consider the original publications for details concerning the models.
+stat.alloc is an R package with a set of functions which allow for an analysis of status allocation, or a process whereby individuals from different **origin categories** (e.g., educational levels) are allocated slots in a set of ranked positions (e.g., occupations ranked by the degree of prestige). @krauze1985 proposed elementary status allocation principles: **meritocracy** and **lottery**, while @karpinski2023, building on their work, proposed a set of formal status allocation models which define the outcome of the status allocation process as a mixture of the elementary principles. A crucial feature of the Karpiński-Skvoretz status allocation model is a parameter called the **mixing coefficient** which specifies the contribution of the principle of meritocracy to the mix. In the simples case, if the mixing coefficient equal 0.4, it means that 40 percent of the time status allocation is driven by meritocracy, while 60 percent of the time it is driven by lottery. Consult the original publications for further details about the models and their substantive justification.
+
+Functions in the package stat.alloc estimate a family of status allocation models, namely:
+
+- models which assume that the mixing coefficient is **constant** across the origin categories. The relevant functions have names which begin with `cmm`, which stands for "constant mixing model";
+- models which assume that the mixing coefficients vary across the origin categories. The relevant functions have names which begin with `dmm`, which stands for "differential mixing model";
+- models which assume that there is a single basis for status allocation (i.e., a merit characteristic) and ones which assume that there are two such bases. Functions to estimate models of the latter type include `2d` in their names.
+
+In addition, some functions in the package use an approach to estimating the parameters which consists in minimising the distance (defined in terms of the Frobenius norm of the difference) between the observed and model-predicted status allocations; these functions have names which end with `_mde`, which stands for **minimum distance estimation**. Other functions in the package estimate the model parameters by maximising the value of the relevant likelihood function; these functions have names which end with `_mle`, which stands for `maximum likelihood estimation`. In most cases, the two approaches to estimation yield estimates which are very similar, but not identical.
 
 ## Installation
 
@@ -36,29 +46,22 @@ devtools::install_github("zbig-karp/stat.alloc")
 
 ## Example
 
-This example walks through a calculation of **meritocratic** and **lottery** allocations from a given (observed) status allocation [check @krauze1985 and @karpinski2023 for formal definitions of the various types of status allocation] and uses the result to estimate a formal model of status allocation.
+This example walks through estimation of the simplest status allocation model, namely, the **constant mixing model**. The outcome of the status allocation process is represented in the form of a matrix whose rows correspond to **origin categories**, while its columns correspond to **destination statuses**. The code below builds a status allocation table with 5 origin categories (i.e., education levels) and 4 destination statuses (i.e., occupational prestige categories). The rows are ordered top to bottom from the highest to the lowest education level, while the columns are ordered left to right from the highest prestige to the lowest prestige category. Each element of the matrix represents the number of individuals with a given level of education who end up in a given occupation. The matrix is reproduced from @krauze1985.
 
-We first set up a status allocation table. It shows counts of individuals from a given educational category (row of the matrix) who end up in a given occupational status [column of the matrix; see @krauze1985 for the source of the data]:
+```{r table-1, echo = -3}
 
-```{r table-1}
-ks1985 <- matrix(
-  c(135, 52, 58, 12, 6, 
-    27, 56, 126, 26, 7, 
-    13, 51, 183, 98, 65, 
-    3, 8, 30, 23, 21), 
-  ncol = 4, dimnames = list(rownames = paste0("E", 1:5), 
-                            colnames = paste0("O", 1:4)))
+data(ks1985)
+t1 <- xtabs(freq ~ edu + status, data = ks1985)
+t1
 ```
 
-Function `mar()` is used to calculate meritocratic and lottery allocations from a given one:
+Function `refall()` is used to calculate meritocratic and lottery allocations from a given one:
 
 ```{r example-1}
 library(stat.alloc)
 
-mar(ks1985)
+refall(t1)
 ```
-
-## Constant mixing models
 
 Function `cmm_mde()` estimates a model which treats the observed status allocation as a mixture of two "pure" status allocation. It returns a list of three elements:
 
@@ -67,39 +70,9 @@ Function `cmm_mde()` estimates a model which treats the observed status allocati
 - the index of dissimilarity between the observed and model-predicted allocations
 
 ```{r example-2}
-cmm_mde(dat = mar(ks1985))
+cmm_mde(dat = refall(t1))
 ```
 
-`cmm_mde()` estimates the mixing coefficient by searching for a value of the coefficient which minimises the distance (or the Frobenius norm of the difference) between the observed and model-predicted status allocations. An alternative, a function called `cmm_mle`, estimates the coefficient by means of maximum likelihood. 
-
-```{r example-3}
-cmm_mle(dat = mar(ks1985))
-```
-
-As we can see, the maximum-likelihood estimate is slightly lower than the minimum-distance one and it has a considerably larger standard error. In terms of fit, as measured with the dissimilarity index, the two estimations are nearly identical, but their predicted counts differ slightly. The index of dissimilarity between the two model-predicted allocations is:
-
-```{r}
-pred_mde <- prop.table(cmm_mde(dat = mar(ks1985))[[2]])
-pred_mle <- prop.table(cmm_mle(dat = mar(ks1985))[[2]])
-sum(abs(pred_mde - pred_mle))/2
-```
-
-Thus, `r round(1000 * sum(abs(pred_mde - pred_mle))/2)` cases (individuals) out of 1,000 have to be re-allocated to equalise the two matrices. It's not much in absolute terms, but it still shows that the two predictions differ.
-
-## Differential mixing models
-
-So far, the mixing coefficient was assumed to be constant across all origin categories. It is possible to relax this assumption and allow each origin category to have its own mixing coefficient. Function `dmm_mde()` fits a **differential mixing model** using the minimum distance estimation routine:
-
-```{r example-4}
-dmm_mde(dat = mar(ks1985))
-```
-
-The object returned by `dmm_mde` has a structure similar to those returned by `cmm_mde` or `cmm_mle`. A primary difference is that `dmm_mde` returns a list of four, rather than three, elements, the additional element being a named numeric vector of so-called adjustment proportions, or a special type of parameter introduced into the model to fit the column marginals [see @karpinski2023 for more details concerning the adjustment proportions].
-
-There is also a function which fits the differential model by means of maximum likelihood estimation, `dmm_mle()`. 
-
-```{r example-5}
-dmm_mle(dat = mar(ks1985))
-```
+Other functions in the package are used in a similar way.
 
 # References

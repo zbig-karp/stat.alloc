@@ -7,13 +7,48 @@
 
 <!-- badges: end -->
 
-stat.alloc is an R package with a set of functions which allow for
-calculating reference allocations for a given (observed) status
-allocation and use these reference allocations to estimate models in a
-family of status allocation models proposed in a series of publications
-by Zbigniew Karpiński and John Skvoretz (see Karpiński and Skvoretz 2023
-for example). Consider the original publications for details concerning
-the models.
+stat.alloc is an R package with a set of functions which allow for an
+analysis of status allocation, or a process whereby individuals from
+different **origin categories** (e.g., educational levels) are allocated
+slots in a set of ranked positions (e.g., occupations ranked by the
+degree of prestige). Krauze and Słomczyński ([1985](#ref-krauze1985))
+proposed elementary status allocation principles: **meritocracy** and
+**lottery**, while Karpiński and Skvoretz ([2023](#ref-karpinski2023)),
+building on their work, proposed a set of formal status allocation
+models which define the outcome of the status allocation process as a
+mixture of the elementary principles. A crucial feature of the
+Karpiński-Skvoretz status allocation model is a parameter called the
+**mixing coefficient** which specifies the contribution of the principle
+of meritocracy to the mix. In the simples case, if the mixing
+coefficient equal 0.4, it means that 40 percent of the time status
+allocation is driven by meritocracy, while 60 percent of the time it is
+driven by lottery. Consult the original publications for further details
+about the models and their substantive justification.
+
+Functions in the package stat.alloc estimate a family of status
+allocation models, namely:
+
+- models which assume that the mixing coefficient is **constant** across
+  the origin categories. The relevant functions have names which begin
+  with `cmm`, which stands for “constant mixing model”;
+- models which assume that the mixing coefficients vary across the
+  origin categories. The relevant functions have names which begin with
+  `dmm`, which stands for “differential mixing model”;
+- models which assume that there is a single basis for status allocation
+  (i.e., a merit characteristic) and ones which assume that there are
+  two such bases. Functions to estimate models of the latter type
+  include `2d` in their names.
+
+In addition, some functions in the package use an approach to estimating
+the parameters which consists in minimising the distance (defined in
+terms of the Frobenius norm of the difference) between the observed and
+model-predicted status allocations; these functions have names which end
+with `_mde`, which stands for **minimum distance estimation**. Other
+functions in the package estimate the model parameters by maximising the
+value of the relevant likelihood function; these functions have names
+which end with `_mle`, which stands for `maximum likelihood estimation`.
+In most cases, the two approaches to estimation yield estimates which
+are very similar, but not identical.
 
 ## Installation
 
@@ -27,62 +62,67 @@ devtools::install_github("zbig-karp/stat.alloc")
 
 ## Example
 
-This example walks through a calculation of **meritocratic** and
-**lottery** allocations from a given (observed) status allocation
-Karpiński and Skvoretz (2023) and uses the result to estimate a formal
-model of status allocation.
-
-We first set up a status allocation table. It shows counts of
-individuals from a given educational category (row of the matrix) who
-end up in a given occupational status \[column of the matrix; see Krauze
-and Słomczyński (1985) for the source of the data\]:
+This example walks through estimation of the simplest status allocation
+model, namely, the **constant mixing model**. The outcome of the status
+allocation process is represented in the form of a matrix whose rows
+correspond to **origin categories**, while its columns correspond to
+**destination statuses**. The code below builds a status allocation
+table with 5 origin categories (i.e., education levels) and 4
+destination statuses (i.e., occupational prestige categories). The rows
+are ordered top to bottom from the highest to the lowest education
+level, while the columns are ordered left to right from the highest
+prestige to the lowest prestige category. Each element of the matrix
+represents the number of individuals with a given level of education who
+end up in a given occupation. The matrix is reproduced from Krauze and
+Słomczyński ([1985](#ref-krauze1985)).
 
 ``` r
-ks1985 <- matrix(
-  c(135, 52, 58, 12, 6, 
-    27, 56, 126, 26, 7, 
-    13, 51, 183, 98, 65, 
-    3, 8, 30, 23, 21), 
-  ncol = 4, dimnames = list(rownames = paste0("E", 1:5), 
-                            colnames = paste0("O", 1:4)))
+
+data(ks1985)
+t1
+#>     status
+#> edu     S1    S2    S3    S4
+#>   E1 11883  2385  1144   277
+#>   E2  4567  4960  4474   709
+#>   E3  5155 11143 16131  2599
+#>   E4  1081  2299  8686  2031
+#>   E5   550   577  5731  1859
 ```
 
-Function `mar()` is used to calculate meritocratic and lottery
+Function `refall()` is used to calculate meritocratic and lottery
 allocations from a given one:
 
 ``` r
 library(stat.alloc)
 
-mar(ks1985)
+refall(t1)
 #> $Actual
-#>         colnames
-#> rownames  O1  O2  O3 O4
-#>       E1 135  27  13  3
-#>       E2  52  56  51  8
-#>       E3  58 126 183 30
-#>       E4  12  26  98 23
-#>       E5   6   7  65 21
+#>     status
+#> edu     S1    S2    S3    S4
+#>   E1 11883  2385  1144   277
+#>   E2  4567  4960  4474   709
+#>   E3  5155 11143 16131  2599
+#>   E4  1081  2299  8686  2031
+#>   E5   550   577  5731  1859
 #> 
 #> $Meritocratic
-#>         colnames
-#> rownames  O1  O2  O3 O4
-#>       E1 178   0   0  0
-#>       E2  85  82   0  0
-#>       E3   0 160 237  0
-#>       E4   0   0 159  0
-#>       E5   0   0  14 85
+#>     status
+#> edu     S1    S2    S3   S4
+#>   E1 15689     0     0    0
+#>   E2  7547  7163     0    0
+#>   E3     0 14201 20827    0
+#>   E4     0     0 14097    0
+#>   E5     0     0  1242 7475
 #> 
 #> $Lottery
-#>         colnames
-#> rownames  O1 O2  O3   O4
-#>       E1  47 43  73 15.1
-#>       E2  44 40  68 14.2
-#>       E3 104 96 163 33.7
-#>       E4  42 38  65 13.5
-#>       E5  26 24  41  8.4
+#>     status
+#> edu    S1   S2    S3   S4
+#>   E1 4131 3798  6430 1329
+#>   E2 3874 3561  6029 1246
+#>   E3 9224 8481 14356 2967
+#>   E4 3712 3413  5778 1194
+#>   E5 2295 2110  3573  738
 ```
-
-## Constant mixing models
 
 Function `cmm_mde()` estimates a model which treats the observed status
 allocation as a mixture of two “pure” status allocation. It returns a
@@ -94,139 +134,25 @@ list of three elements:
   allocations
 
 ``` r
-cmm_mde(dat = mar(ks1985))
+cmm_mde(dat = refall(t1))
 #> $`Mixing coefficient`
-#>   Estimate   S.E. z test p value
-#> 1     0.45 0.0026    173 < 0.001
+#>   Estimate     S.E. z test p value
+#> 1    0.448 2.93e-05  15251 < 0.001
 #> 
 #> $`Model-predicted allocation`
-#>         colnames
-#> rownames  O1  O2  O3   O4
-#>       E1 106  24  40  8.4
-#>       E2  62  59  38  7.8
-#>       E3  58 125 196 18.6
-#>       E4  23  21 107  7.5
-#>       E5  14  13  29 42.7
+#>     status
+#> edu    S1    S2    S3   S4
+#>   E1 9304  2098  3552  734
+#>   E2 5518  5173  3331  688
+#>   E3 5096 11041 17252 1639
+#>   E4 2051  1885  9501  660
+#>   E5 1268  1166  2530 3753
 #> 
 #> $`Dissimilarity index`
-#> [1] 0.12
+#> [1] 0.115
 ```
 
-`cmm_mde()` estimates the mixing coefficient by searching for a value of
-the coefficient which minimises the distance (or the Frobenius norm of
-the difference) between the observed and model-predicted status
-allocations. An alternative, a function called `cmm_mle`, estimates the
-coefficient by means of maximum likelihood.
-
-``` r
-cmm_mle(dat = mar(ks1985))
-#> $`Mixing coefficient`
-#>   Estimate  S.E. z test p value
-#> 1     0.42 0.027     15 < 0.001
-#> 
-#> $`Model-predicted allocation`
-#>         colnames
-#> rownames  O1  O2  O3   O4
-#>       E1 102  25  42  8.8
-#>       E2  61  58  40  8.3
-#>       E3  61 123 194 19.6
-#>       E4  24  22 104  7.9
-#>       E5  15  14  29 40.5
-#> 
-#> $`Dissimilarity index`
-#> [1] 0.11
-```
-
-As we can see, the maximum-likelihood estimate is slightly lower than
-the minimum-distance one and it has a considerably larger standard
-error. In terms of fit, as measured with the dissimilarity index, the
-two estimations are nearly identical, but their predicted counts differ
-slightly. The index of dissimilarity between the two model-predicted
-allocations is:
-
-``` r
-pred_mde <- prop.table(cmm_mde(dat = mar(ks1985))[[2]])
-pred_mle <- prop.table(cmm_mle(dat = mar(ks1985))[[2]])
-sum(abs(pred_mde - pred_mle))/2
-#> [1] 0.015
-```
-
-Thus, 15 cases (individuals) out of 1,000 have to be re-allocated to
-equalise the two matrices. It’s not much in absolute terms, but it still
-shows that the two predictions differ.
-
-## Differential mixing models
-
-So far, the mixing coefficient was assumed to be constant across all
-origin categories. It is possible to relax this assumption and allow
-each origin category to have its own mixing coefficient. Function
-`dmm_mde()` fits a **differential mixing model** using the minimum
-distance estimation routine:
-
-``` r
-dmm_mde(dat = mar(ks1985))
-#> $`Mixing coefficient`
-#>   Estimate   S.E. z test p value
-#> 1     0.71 0.0039    183 < 0.001
-#> 2     0.33 0.0070     47 < 0.001
-#> 3     0.15 0.0132     12 < 0.001
-#> 4     0.34 0.0071     48 < 0.001
-#> 5     0.14 0.0083     16 < 0.001
-#> 
-#> $`Adjustment proportions`
-#>   O1   O2   O3   O4 
-#> 0.16 0.28 0.46 0.11 
-#> 
-#> $`Model-predicted allocation`
-#>         colnames
-#> rownames  O1  O2  O3   O4
-#>       E1 134  14  24  5.5
-#>       E2  46  58  52 11.9
-#>       E3  53 117 191 35.8
-#>       E4  17  29 102 11.1
-#>       E5  13  24  41 20.6
-#> 
-#> $`Dissimilarity index`
-#> [1] 0.069
-```
-
-The object returned by `dmm_mde` has a structure similar to those
-returned by `cmm_mde` or `cmm_mle`. A primary difference is that
-`dmm_mde` returns a list of four, rather than three, elements, the
-additional element being a named numeric vector of so-called adjustment
-proportions, or a special type of parameter introduced into the model to
-fit the column marginals (see Karpiński and Skvoretz 2023 for more
-details concerning the adjustment proportions).
-
-There is also a function which fits the differential model by means of
-maximum likelihood estimation, `dmm_mle()`.
-
-``` r
-dmm_mle(dat = mar(ks1985))
-#> $`Mixing coefficient`
-#>   Estimate  S.E. z test p value
-#> 1    0.723 0.035  20.94 < 0.001
-#> 2    0.413 0.063   6.55 < 0.001
-#> 3    0.094 0.132   0.71    n.s.
-#> 4    0.251 0.083   3.03  < 0.01
-#> 5    0.171 0.058   2.97  < 0.01
-#> 
-#> $`Adjustment proportions`
-#>    O1    O2    O3    O4 
-#> 0.140 0.273 0.488 0.099 
-#> 
-#> $`Model-predicted allocation`
-#>         colnames
-#> rownames  O1  O2  O3   O4
-#>       E1 136  13  24  4.9
-#>       E2  49  61  48  9.8
-#>       E3  50 113 198 35.8
-#>       E4  17  32  98 11.9
-#>       E5  11  22  42 22.7
-#> 
-#> $`Dissimilarity index`
-#> [1] 0.074
-```
+Other functions in the package are used in a similar way.
 
 # References
 
