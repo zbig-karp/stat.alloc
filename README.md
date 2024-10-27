@@ -77,16 +77,16 @@ end up in a given occupation. The matrix is reproduced from Krauze and
 Słomczyński ([1985](#ref-krauze1985)).
 
 ``` r
-
 data(ks1985)
+t1 <- xtabs(freq ~ degree + status, data = ks1985)
 t1
-#>     status
-#> edu     S1    S2    S3    S4
-#>   E1 11883  2385  1144   277
-#>   E2  4567  4960  4474   709
-#>   E3  5155 11143 16131  2599
-#>   E4  1081  2299  8686  2031
-#>   E5   550   577  5731  1859
+#>       status
+#> degree    S1    S2    S3    S4
+#>     E1 11883  2385  1144   277
+#>     E2  4567  4960  4474   709
+#>     E3  5155 11143 16131  2599
+#>     E4  1081  2299  8686  2031
+#>     E5   550   577  5731  1859
 ```
 
 Function `refall()` is used to calculate meritocratic and lottery
@@ -97,31 +97,31 @@ library(stat.alloc)
 
 refall(t1)
 #> $Actual
-#>     status
-#> edu     S1    S2    S3    S4
-#>   E1 11883  2385  1144   277
-#>   E2  4567  4960  4474   709
-#>   E3  5155 11143 16131  2599
-#>   E4  1081  2299  8686  2031
-#>   E5   550   577  5731  1859
+#>       status
+#> degree    S1    S2    S3    S4
+#>     E1 11883  2385  1144   277
+#>     E2  4567  4960  4474   709
+#>     E3  5155 11143 16131  2599
+#>     E4  1081  2299  8686  2031
+#>     E5   550   577  5731  1859
 #> 
 #> $Meritocratic
-#>     status
-#> edu     S1    S2    S3   S4
-#>   E1 15689     0     0    0
-#>   E2  7547  7163     0    0
-#>   E3     0 14201 20827    0
-#>   E4     0     0 14097    0
-#>   E5     0     0  1242 7475
+#>       status
+#> degree    S1    S2    S3   S4
+#>     E1 15689     0     0    0
+#>     E2  7547  7163     0    0
+#>     E3     0 14201 20827    0
+#>     E4     0     0 14097    0
+#>     E5     0     0  1242 7475
 #> 
 #> $Lottery
-#>     status
-#> edu    S1   S2    S3   S4
-#>   E1 4131 3798  6430 1329
-#>   E2 3874 3561  6029 1246
-#>   E3 9224 8481 14356 2967
-#>   E4 3712 3413  5778 1194
-#>   E5 2295 2110  3573  738
+#>       status
+#> degree   S1   S2    S3   S4
+#>     E1 4131 3798  6430 1329
+#>     E2 3874 3561  6029 1246
+#>     E3 9224 8481 14356 2967
+#>     E4 3712 3413  5778 1194
+#>     E5 2295 2110  3573  738
 ```
 
 Function `cmm_mde()` estimates a model which treats the observed status
@@ -140,13 +140,13 @@ cmm_mde(dat = refall(t1))
 #> 1    0.448 2.93e-05  15251 < 0.001
 #> 
 #> $`Model-predicted allocation`
-#>     status
-#> edu    S1    S2    S3   S4
-#>   E1 9304  2098  3552  734
-#>   E2 5518  5173  3331  688
-#>   E3 5096 11041 17252 1639
-#>   E4 2051  1885  9501  660
-#>   E5 1268  1166  2530 3753
+#>       status
+#> degree   S1    S2    S3   S4
+#>     E1 9304  2098  3552  734
+#>     E2 5518  5173  3331  688
+#>     E3 5096 11041 17252 1639
+#>     E4 2051  1885  9501  660
+#>     E5 1268  1166  2530 3753
 #> 
 #> $`Dissimilarity index`
 #> [1] 0.115

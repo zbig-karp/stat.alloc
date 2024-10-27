@@ -48,10 +48,10 @@ devtools::install_github("zbig-karp/stat.alloc")
 
 This example walks through estimation of the simplest status allocation model, namely, the **constant mixing model**. The outcome of the status allocation process is represented in the form of a matrix whose rows correspond to **origin categories**, while its columns correspond to **destination statuses**. The code below builds a status allocation table with 5 origin categories (i.e., education levels) and 4 destination statuses (i.e., occupational prestige categories). The rows are ordered top to bottom from the highest to the lowest education level, while the columns are ordered left to right from the highest prestige to the lowest prestige category. Each element of the matrix represents the number of individuals with a given level of education who end up in a given occupation. The matrix is reproduced from @krauze1985.
 
-```{r table-1, echo = -3}
+```{r table-1, echo = 2:4}
 
 data(ks1985)
-t1 <- xtabs(freq ~ edu + status, data = ks1985)
+t1 <- xtabs(freq ~ degree + status, data = ks1985)
 t1
 ```
 
