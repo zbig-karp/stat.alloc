@@ -2,7 +2,7 @@
 #'
 #' The function estimates a mixing coefficient in the constant mixing model by minimising the distance between observed and model-predicted status allocations. `cmm` stands for "constant mixing model", while `mde` stands for "minimum distance estimation".
 #'
-#' @param dat an object returned by `stat.alloc::mar()`, or a list with the following three elements: the observed status allocation, the meritocratic status allocation, and the lottery allocation.
+#' @param dat an object returned by `stat.alloc::refall()`, or a list with the following three elements: the observed status allocation, the meritocratic status allocation, and the lottery allocation.
 #'
 #' @return a list of three elements:
 #' - a data frame with the estimated mixing coefficient, its standard error and test statistics
@@ -11,9 +11,10 @@
 #' @export
 #'
 #' @examples
-#' ks1985 <- matrix(c(135, 52, 58, 12, 6, 27, 56, 126, 26, 7, 13, 51, 183, 98, 65, 3, 8, 30, 23, 2), ncol = 4, dimnames = list(rownames = paste0("E", 1:5), colnames = paste0("O", 1:4)))
-#' ks1985_mar <- mar(x = ks1985)
-#' cmm_mde(ks1985_mar)
+#' data(ks1985)
+#' t1 <- xtabs(freq ~ degree + status, data = ks1985)
+#' t1_ref <- refall(x = t1)
+#' cmm_mde(t1_ref)
 
 cmm_mde <- function(dat) {
 
@@ -24,9 +25,9 @@ cmm_mde <- function(dat) {
   }
 
   # Minimising the distance between the observed and the model-predicted allocations
-  out <- optim(par = 0.5,
+  out <- stats::optim(par = 0.5,
                fn = mc,
-               dat = mar(ks1985),
+               dat = dat,
                method = "L-BFGS-B", lower = 0 + 1e-5, upper = 1 - 1e-5,
                hessian = TRUE)
 
@@ -49,7 +50,7 @@ cmm_mde <- function(dat) {
 #'
 #' The function estimates a mixing coefficient in the constant mixing model by means of maximum likelihood. `cmm` stands for "constant mixing model", while `mde` stands for "minimum distance estimation".
 #'
-#' @param dat an object returned by `stat.alloc::mar()`, or a list with the following three elements: the observed status allocation, the meritocratic status allocation, and the lottery allocation.
+#' @param dat an object returned by `stat.alloc::refall()`, or a list with the following three elements: the observed status allocation, the meritocratic status allocation, and the lottery allocation.
 #'
 #' @return a list of three elements:
 #' - a data frame with the estimated mixing coefficient, its standard error and test statistics
@@ -58,9 +59,10 @@ cmm_mde <- function(dat) {
 #' @export
 #'
 #' @examples
-#' ks1985 <- matrix(c(135, 52, 58, 12, 6, 27, 56, 126, 26, 7, 13, 51, 183, 98, 65, 3, 8, 30, 23, 2), ncol = 4, dimnames = list(rownames = paste0("E", 1:5), colnames = paste0("O", 1:4)))
-#' ks1985_mar <- mar(x = ks1985)
-#' cmm_mle(ks1985_mar)
+#' data(ks1985)
+#' t1 <- xtabs(freq ~ degree + status, data = ks1985)
+#' t1_ref <- refall(x = t1)
+#' cmm_mle(t1_ref)
 
 cmm_mle <- function(dat) {
 
@@ -106,7 +108,7 @@ cmm_mle <- function(dat) {
 #'
 #' The function estimates mixing coefficients in the differential mixing model by minimising the distance between observed and model-predicted status allocations. `dmm` stands for "differential mixing model", while `mde` stands for "minimum distance estimation".
 #'
-#' @param dat an object returned by `stat.alloc::mar()`, or a list with the following three elements: the observed status allocation, the meritocratic status allocation, and the lottery allocation.
+#' @param dat an object returned by `stat.alloc::refall()`, or a list with the following three elements: the observed status allocation, the meritocratic status allocation, and the lottery allocation.
 #'
 #' @return a list of four elements:
 #' - a data frame with the estimated mixing coefficients, one coefficient per origin category, their standard error and associated test statistics
@@ -116,9 +118,10 @@ cmm_mle <- function(dat) {
 #' @export
 #'
 #' @examples
-#' ks1985 <- matrix(c(135, 52, 58, 12, 6, 27, 56, 126, 26, 7, 13, 51, 183, 98, 65, 3, 8, 30, 23, 2), ncol = 4, dimnames = list(rownames = paste0("E", 1:5), colnames = paste0("O", 1:4)))
-#' ks1985_mar <- mar(x = ks1985)
-#' dmm_mde(ks1985_mar)
+#' data(ks1985)
+#' t1 <- xtabs(freq ~ degree + status, data = ks1985)
+#' t1_ref <- refall(x = t1)
+#' dmm_mde(t1_ref)
 
 dmm_mde <- function(dat) {
 
@@ -196,7 +199,7 @@ dmm_mde <- function(dat) {
 #'
 #' The function estimates mixing coefficients in the differential mixing model by means of maximum likelihood. `dmm` stands for "differential mixing model", while `mle` stands for "maximum likelihood estimation".
 #'
-#' @param dat an object returned by `stat.alloc::mar()`, or a list with the following three elements: the observed status allocation, the meritocratic status allocation, and the lottery allocation.
+#' @param dat an object returned by `stat.alloc::refall()`, or a list with the following three elements: the observed status allocation, the meritocratic status allocation, and the lottery allocation.
 #'
 #' @return a list of four elements:
 #' - a data frame with the estimated mixing coefficients, one coefficient per origin category, their standard error and associated test statistics
@@ -206,9 +209,10 @@ dmm_mde <- function(dat) {
 #' @export
 #'
 #' @examples
-#' ks1985 <- matrix(c(135, 52, 58, 12, 6, 27, 56, 126, 26, 7, 13, 51, 183, 98, 65, 3, 8, 30, 23, 2), ncol = 4, dimnames = list(rownames = paste0("E", 1:5), colnames = paste0("O", 1:4)))
-#' ks1985_mar <- mar(x = ks1985)
-#' dmm_mle(ks1985_mar)
+#' data(ks1985)
+#' t1 <- xtabs(freq ~ degree + status, data = ks1985)
+#' t1_ref <- refall(x = t1)
+#' dmm_mle(t1_ref)
 
 dmm_mle <- function(dat) {
 
@@ -231,7 +235,7 @@ dmm_mle <- function(dat) {
         aprime[i, j] <- (alpha[i] * dat$Meritocratic[i, j] + (1 - alpha[i]) * target[j] * row_mrg[i])/sum(dat$Actual)
     }
 
-    fake <- 99999
+    fake <- 9.999 * 1e9
     ll <- -sum(dat$Actual * log(aprime))
 
     if (is.finite(ll)) {
@@ -243,7 +247,7 @@ dmm_mle <- function(dat) {
   }
 
   # Maximising the likelihood with respect to the mixing coefficient
-  out <- optim(par = rep(0.5, times = nrow(dat$Actual)),
+  out <- optim(par = rep(0.001, times = nrow(dat$Actual)),
                fn = mc,
                dat = dat,
                method = "L-BFGS-B",

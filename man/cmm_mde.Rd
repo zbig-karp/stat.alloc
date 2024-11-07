@@ -7,7 +7,7 @@
 cmm_mde(dat)
 }
 \arguments{
-\item{dat}{an object returned by \code{stat.alloc::mar()}, or a list with the following three elements: the observed status allocation, the meritocratic status allocation, and the lottery allocation.}
+\item{dat}{an object returned by \code{stat.alloc::refall()}, or a list with the following three elements: the observed status allocation, the meritocratic status allocation, and the lottery allocation.}
 }
 \value{
 a list of three elements:
@@ -21,7 +21,8 @@ a list of three elements:
 The function estimates a mixing coefficient in the constant mixing model by minimising the distance between observed and model-predicted status allocations. \code{cmm} stands for "constant mixing model", while \code{mde} stands for "minimum distance estimation".
 }
 \examples{
-ks1985 <- matrix(c(135, 52, 58, 12, 6, 27, 56, 126, 26, 7, 13, 51, 183, 98, 65, 3, 8, 30, 23, 2), ncol = 4, dimnames = list(rownames = paste0("E", 1:5), colnames = paste0("O", 1:4)))
-ks1985_mar <- mar(x = ks1985)
-cmm_mde(ks1985_mar)
+data(ks1985)
+t1 <- xtabs(freq ~ degree + status, data = ks1985)
+t1_ref <- refall(x = t1)
+cmm_mde(t1_ref)
 }

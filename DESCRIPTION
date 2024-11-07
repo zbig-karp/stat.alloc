@@ -2,12 +2,12 @@ Package: stat.alloc
 Title: Estimation of Status Allocation Models
 Version: 0.0.0.9000
 Authors@R: c(
-    person(given = "Zbigniew", family = "Karpiński", email = "zbigniew.karpinski@startmail.com", 
+    person(given = "Zbigniew", family = "Karpinski", email = "zbigniew.karpinski@startmail.com", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9109-1854")),
     person(given = "John", family = "Skvoretz", email = "jskvoretz@usf.edu", role = "aut",
            comment = c(ORCID = "0000-0003-0573-1710")))
 Description: Custom functions to derive reference status allocations and estimate different 
-    status allocation models
+    status allocation models.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -17,5 +17,10 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     dplyr,
+    forcats,
+    purrr,
     tibble,
     tidyr
+Depends: 
+    R (>= 2.10)
+LazyData: true

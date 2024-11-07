@@ -2,7 +2,7 @@
 % Please edit documentation in R/refall.R
 \name{refall}
 \alias{refall}
-\title{Title}
+\title{Single-dimensional model of status allocation}
 \usage{
 refall(x)
 }
@@ -18,7 +18,7 @@ A list of three matrices, each of the same order as \code{x}:
 }
 }
 \description{
-Title
+Single-dimensional model of status allocation
 }
 \examples{
 data(ks1985)
