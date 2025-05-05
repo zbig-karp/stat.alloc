@@ -305,7 +305,7 @@ dmm2d_mde <- function(dat) {
     term = paste(c(rep("Dim 1", k1), rep("Dim 2", k2)), c(mcat1, mcat2), sep = ": "),
     Estimate = out$par,
     `S.E.` = sqrt(diag(1/out$hessian)),
-    `z-statistic` = estimate/std.error,
+    `z-statistic` = Estimate/`S.E.`,
     `p-value` = 2 * pnorm(abs(`z-statistic`), lower.tail = FALSE)
   )
 
