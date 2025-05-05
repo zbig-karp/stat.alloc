@@ -236,11 +236,12 @@ cmm2d_mle_ext <- function(dat) {
 #'
 #' @param dat An object returned by the function `refall2d`
 #'
-#' @return a list with four elements:
+#' @return a list with five elements:
 #'   - a tibble with the estimated coefficients and relevant statistical tests;
-#'   - a matrix representing the model-predicted status allocation;
+#'   - a named vector of adjustment proportions
 #'   - the index of dissimilarity between the observed and model-predicted status allocations;
 #'   - the minimised distance (i.e., the Frobenius norm of the difference) between the observed and model-predicted status allocations
+#'   - a matrix representing the model-predicted status allocation;
 #' @export
 #'
 #' @examples
@@ -284,6 +285,118 @@ dmm2d_mde <- function(dat) {
     # The distance from prediction to observation
     ll <- norm(pred - dat[[1]], type = "F")
     fake <- 99999999
+    if (is.finite(ll)) {
+      fake <- ll
+    } else {
+      ll <- fake
+    }
+    ll
+  }
+
+  out <- optim(par = rep(0.5, k1 + k2),
+               fn = mixcoef,
+               dat = dat,
+               method = "L-BFGS-B",
+               lower = rep(0, k1 + k2),
+               upper = rep(1, k1 + k2),
+               hessian = TRUE)
+
+  # A table with mixing coefficients
+  est_table <- tibble(
+    term = paste(c(rep("Dim 1", k1), rep("Dim 2", k2)), c(mcat1, mcat2), sep = ": "),
+    Estimate = out$par,
+    `S.E.` = sqrt(diag(1/out$hessian)),
+    `z-statistic` = Estimate/`S.E.`,
+    `p-value` = 2 * pnorm(abs(`z-statistic`), lower.tail = FALSE)
+  )
+
+  # Adjustment proportions
+  a <- out$par[1:k1]
+  b <- out$par[(k1 + 1):(k1 + k2)]
+  target <- rep(0, times = ncol(dat[[1]]))
+  target <- (colSums(dat[[1]]) -
+               colSums(as.double(outer(b, a)) * dat[[2]]) -
+               colSums(as.double(outer(1 - b, a)) * dat[[3]]) -
+               colSums(as.double(outer(b, 1 - a)) * dat[[4]]))/
+    sum(as.double(outer(1 - b, 1 - a)) * rowSums(dat[[5]]))
+
+
+  # A table with adjustment proportions
+  adj_prop <- tibble(
+    status = colnames(dat[[1]]),
+    adj_prop = target
+  )
+
+  # Predicted counts
+  pred <- as.double(t(outer(a, b))) * dat[[2]] +
+    as.double(t(outer(a, 1 - b))) * dat[[3]] +
+    as.double(t(outer(1 - a, b))) * dat[[4]] +
+    as.double(t(outer(1 - a, 1- b))) * outer(rowSums(dat[[5]]), target)
+
+  # Goodness of fit
+  delta <- sum(abs(pred - dat[[1]]))/(2 * sum(dat[[1]]))
+
+  # Distance
+  distance <- out$value
+
+  list("Mixing coefficient" = est_table, "Adjustment proportions" = target,
+       "Dissimilarity index" = delta, "Minimised distance" = distance,
+       "Predicted counts" = pred)
+}
+
+#' Two-dimensional differential mixing model with the maximum-likelihood estimation routine
+#'
+#' @param dat An object returned by the function `refall2d`
+#'
+#' @return a list with five elements:
+#'   - a tibble with the estimated coefficients and relevant statistical tests;
+#'   - a named vector of adjustment proportions
+#'   - the index of dissimilarity between the observed and model-predicted status allocations;
+#'   - the minimised distance (i.e., the Frobenius norm of the difference) between the observed and model-predicted status allocations
+#'   - a matrix representing the model-predicted status allocation;
+#' @export
+#'
+#' @examples
+#' t1 <- refall2d(xtabs(freq ~ origin + status, data = ks1985))
+#' dmm2d_mde(t1)
+
+dmm2d_mle <- function(dat) {
+
+  # Auxiliary objects ----
+  # Joint categories of the merit characteristics
+  mcats <- rownames(dat[[1]])
+  mcats <- str_split(string = mcats, pattern = "-", simplify = TRUE)
+  # Categories of the primary characteristic
+  mcat1 <- unique(mcats[, 1])
+  # Categories of the secondary characteristic
+  mcat2 <- unique(mcats[, 2])
+  # The number of categories of the primary characteristic
+  k1 <- length(mcat1)
+  # The number of categories of the secondary characteristic
+  k2 <- length(mcat2)
+
+  # The function to be optimised over ----
+  mixcoef <- function(dat, mc) {
+    a <- mc[1:k1]
+    b <- mc[(k1 + 1):(k1 + k2)]
+
+    # Adjustment proportions
+    target <- rep(0, times = ncol(dat[[1]]))
+    target <- (colSums(dat[[1]]) -
+                 colSums(as.double(outer(b, a)) * dat[[2]]) -
+                 colSums(as.double(outer(1 - b, a)) * dat[[3]]) -
+                 colSums(as.double(outer(b, 1 - a)) * dat[[4]]))/
+      sum(as.double(outer(1 - b, 1 - a)) * rowSums(dat[[5]]))
+
+    # Predicted counts
+    pred <- as.double(t(outer(a, b))) * dat[[2]] +
+      as.double(t(outer(a, 1 - b))) * dat[[3]] +
+      as.double(t(outer(1 - a, b))) * dat[[4]] +
+      as.double(t(outer(1 - a, 1- b))) * outer(rowSums(dat[[5]]), target)
+
+    fake <- 9.999 * 10^9
+    ll <- -sum(dat$Actual * log(pred))
+
     if (is.finite(ll)) {
       fake <- ll
     } else {
