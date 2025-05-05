@@ -4,18 +4,14 @@
 \alias{refall2d}
 \title{Two-dimensional model of status allocation}
 \usage{
-refall2d(d, dim1, dim2, status, f)
+refall2d(dat, n1 = NULL, n2 = NULL)
 }
 \arguments{
-\item{d}{the data frame containing the data}
+\item{n1}{the number of categories of the primary characteristic. Ignored if \code{!is.null(rownames(dat))}. Necessary if \code{is.null(rownames(dat))}}
 
-\item{dim1}{the name of the variable in \code{d} corresponding to the primary merit characteristic}
+\item{n2}{the number of categories of the secondary characteristic. Ignored if \code{!is.null(rownames(dat))}. Necessary if \code{is.null(rownames(dat))}}
 
-\item{dim2}{the name of the variable in \code{d} corresponding to the secondary merit characteristic}
-
-\item{status}{the name of the variable in \code{d} corresponding to the destination status}
-
-\item{f}{the name of the variable in \code{d} corresponding to the counts of unique combinations of the values of dim1, dim2, and status}
+\item{d}{a matrix representing the outcome of a process of status allocation with two merit dimensions (or two bases for status allocation). The rows of the matrix correspond to combined categories of the merit characteristics ordered lexicographically. The rows should have names of the form 'Xi-Yj', where the symbol left of the dash indicates category of the primary characteristic and the symbol right of the dash indicates the category of the secondary characteristic}
 }
 \value{
 a list with five status allocation matrices:
@@ -30,7 +26,10 @@ a list with five status allocation matrices:
 \description{
 Two-dimensional model of status allocation
 }
+\details{
+The function requires that \code{dat} has row names, so either provide the names explicitly or specify the numbers of categories of the two merit characteristics, using the arguments \code{n1} and \code{n2}. In the latter case, some generic labels will be generated. For example, in the case of two merit characteristics, X and Y, a vector of row names will be generated of the following form: \code{Xi-Yj}, where $i = 1,\ldots,n1$ and $j = 1,\ldots,n2$. If the row names are provided explicitly, n1 and n2 are ignored.
+}
 \examples{
 data(ks1985)
-refall2d(d = ks1985, dim1 = "degree", dim2 = "sex", status = "status", f = "freq")
+refall2d(dat = xtabs(freq ~ origin + status, data = ks1985))
 }

@@ -28,7 +28,7 @@ refall <- function(x) {
 
 #' Two-dimensional model of status allocation
 #'
-#' @param d a matrix representing the outcome of a process of status allocation with two merit dimensions (or two bases for status allocation). The rows of the matrix correspond to combined categories of the merit characteristics ordered lexicographically. The rows should have names of the form 'Xi-Yj', where the symbol left of the dash indicates category of the primary characteristic and the symbol right of the dash indicates the category of the secondary characteristic
+#' @param dat a matrix representing the outcome of a process of status allocation with two merit dimensions (or two bases for status allocation). The rows of the matrix correspond to combined categories of the merit characteristics ordered lexicographically. The rows should have names of the form 'Xi-Yj', where the symbol left of the dash indicates category of the primary characteristic and the symbol right of the dash indicates the category of the secondary characteristic
 #' @param n1 the number of categories of the primary characteristic. Ignored if `!is.null(rownames(dat))`. Necessary if `is.null(rownames(dat))`
 #' @param n2 the number of categories of the secondary characteristic. Ignored if `!is.null(rownames(dat))`. Necessary if `is.null(rownames(dat))`
 #' @details
@@ -48,6 +48,15 @@ refall <- function(x) {
 #' refall2d(dat = xtabs(freq ~ origin + status, data = ks1985))
 
 refall2d <- function(dat, n1 = NULL, n2 = NULL) {
+  if (is.null(rownames(dat)) & (is.null(n1) | is.null(n2)))
+    stop("Row names for `dat` are required for the function to be executed")
+  else if (is.null(rownames(dat)) & !(is.null(n1) | is.null(n2))) {
+    if (n1 * n2 != nrow(dat)) stop("The numbers `n1` and `n2` are inconsistent with `nrow(dat)`!")
+    x_cat <- paste0("X", 1:n1)
+    y_cat <- paste0("Y", 1:n2)
+    rownames(dat) <- paste(rep(x_cat, each = n2), rep(y_cat, times = n1), sep = "-")
+  }
+
   # The labels for the original categories (taken from the rownames of dat)
   r_margs <- str_split(string = rownames(dat), pattern = "-", simplify = TRUE)
 
