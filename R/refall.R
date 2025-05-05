@@ -28,11 +28,12 @@ refall <- function(x) {
 
 #' Two-dimensional model of status allocation
 #'
-#' @param d the data frame containing the data
-#' @param dim1 the name of the variable in `d` corresponding to the primary merit characteristic
-#' @param dim2 the name of the variable in `d` corresponding to the secondary merit characteristic
-#' @param status the name of the variable in `d` corresponding to the destination status
-#' @param f the name of the variable in `d` corresponding to the counts of unique combinations of the values of dim1, dim2, and status
+#' @param d a matrix representing the outcome of a process of status allocation with two merit dimensions (or two bases for status allocation). The rows of the matrix correspond to combined categories of the merit characteristics ordered lexicographically. The rows should have names of the form 'Xi-Yj', where the symbol left of the dash indicates category of the primary characteristic and the symbol right of the dash indicates the category of the secondary characteristic
+#' @param n1 the number of categories of the primary characteristic. Ignored if `!is.null(rownames(dat))`. Necessary if `is.null(rownames(dat))`
+#' @param n2 the number of categories of the secondary characteristic. Ignored if `!is.null(rownames(dat))`. Necessary if `is.null(rownames(dat))`
+#' @details
+#' The function requires that `dat` has row names, so either provide the names explicitly or specify the numbers of categories of the two merit characteristics, using the arguments `n1` and `n2`. In the latter case, some generic labels will be generated. For example, in the case of two merit characteristics, X and Y, a vector of row names will be generated of the following form: `Xi-Yj`, where $i = 1,\ldots,n1$ and $j = 1,\ldots,n2$. If the row names are provided explicitly, n1 and n2 are ignored.
+#'
 #'
 #' @return a list with five status allocation matrices:
 #' - actual (or observed);
@@ -44,51 +45,70 @@ refall <- function(x) {
 #'
 #' @examples
 #' data(ks1985)
-#' refall2d(d = ks1985, dim1 = "degree", dim2 = "sex", status = "status", f = "freq")
+#' refall2d(dat = xtabs(freq ~ origin + status, data = ks1985))
 
-refall2d <- function(d, dim1, dim2, status, f) {
+refall2d <- function(dat, n1 = NULL, n2 = NULL) {
+  # The labels for the original categories (taken from the rownames of dat)
+  r_margs <- str_split(string = rownames(dat), pattern = "-", simplify = TRUE)
 
-  # Changing the names of the original variables
+  # Categories of the primary dimension
+  d1_levels <- unique(r_margs[, 1])
+  n1 <- length(d1_levels)
 
-  d <- d[, c(f, dim1, dim2, status)]
-  names(d) <- c("f", "dim1", "dim2", "status")
+  # Categories of the secondary dimension
+  d2_levels <- unique(r_margs[, 2])
+  n2 <- length(d2_levels)
 
-  # Reordering the rows of d by levels of the merit dimensions
-  d <- d |>
-    dplyr::arrange(dim1, dim2)
+  # Collapsing dat over the categories of the secondary dimension to obtain status allocation
+  # along the primary dimension only
+  dat1d <- matrix(NA, nrow = n1, ncol = ncol(dat),
+                  dimnames = list(
+                    origin = d1_levels,
+                    destination = colnames(dat)
+                  ))
+  for (i in 1:n1) {
+    .f <- n2 * i - (n2 - 1)
+    .t <- n2 * i
+    dat1d[i, ] <- colSums(dat[.f:.t, ])
+  }
 
-  # Cross-classification of the merit dimensions
-  t1 <- xtabs(f ~ dim1 + dim2, data = d)
+  # Merit and lottery allocations along the primary dimension
+  stall <- refall(dat1d)
 
-  # Status allocation table collapsed over the categories of dim2
-  t2 <- xtabs(f ~ dim1 + status, data = d)
+  # Calculating the reference distributions resulting from meritocracy along the primary dimension
+  aux <- vector(mode = "list", length = n1)
+  for (i in 1:n1) {
+    .f <- n2 * i - (n2 - 1)
+    .t <- n2 * i
+    aux[[i]] <- outer(rowSums(dat)[.f:.t], stall[[2]][i, ])/sum(stall[[2]][i, ])
+  }
+  aux <- aux |>
+    map(refall)
+  mm <- aux |>
+    map(~.[[2]]) %>%
+    do.call("rbind", .)
+  ml <- aux |>
+    map(~.[[3]]) %>%
+    do.call("rbind", .)
+  rm(aux)
 
-  # Lottery and meritocratic allocations based on t2
-  t2 <- refall(t2)
+  # Calculating the reference distributions resulting from lottery along the primary dimension
+  aux <- vector(mode = "list", length = n1)
+  for (i in 1:n1) {
+    .f <- n2 * i - (n2 - 1)
+    .t <- n2 * i
+    aux[[i]] <- outer(rowSums(dat)[.f:.t], stall[[3]][i, ])/sum(stall[[3]][i, ])
+  }
+  aux <- aux |>
+    map(refall)
+  lm <- aux |>
+    map(~.[[2]]) %>%
+    do.call("rbind", .)
+  ll <- aux |>
+    map(~.[[3]]) %>%
+    do.call("rbind", .)
 
-  # Joint origin category
-  d <- d |>
-    tidyr::unite(col = "origin", dim1, dim2, sep = "-", remove = FALSE) |>
-    dplyr::mutate(origin = forcats::fct_inorder(origin))
-
-  # Observed status allocation with joint origin categories
-  t3 <- xtabs(f ~ origin + status, data = d)
-
-  ll <- vector(mode = "list", length = nrow(t1))
-  for (i in 1:length(ll)) ll[[i]] <- outer(t1[i, ], t2[[3]][i, ], "*")/sum(t1[i, ])
-
-  lm <- purrr::map(ll, ~refall(.)[[2]])
-
-  ml <- vector(mode = "list", length = nrow(t1))
-  for (i in 1:length(ml)) ml[[i]] <- outer(t1[i, ], t2[[2]][i, ], "*")/sum(t1[i, ])
-
-  mm <- purrr::map(ml, ~refall(.)[[2]])
-
-  out <- list(mm, ml, lm, ll) |>
-    purrr::map(~do.call("rbind", .))
-
-  for (i in 1:length(out)) rownames(out[[i]]) <- rownames(t3)
-  names(out) <- c("Meritocracy on both merit dimensions", "Meritocracy on the primary, lottery on the secondary dimension", "Lottery on the primary, meritocracy on the secondary dimension", "Lottery on both merit dimensions")
-
-  c("Actual" = list(t3), out)
+  out <- list(Actual = dat, MM = mm, ML = ml, LM = lm, LL = ll)
+  rm(list = ls()[ls() != "out"])
+  out
 }
