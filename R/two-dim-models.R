@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-#' t1 <- refall2d(d = ks1985, dim1 = "degree", dim2 = "sex", status = "status", f = "freq")
+#' t1 <- refall2d(xtabs(freq ~ origin + status, data = ks1985))
 #' cmm2d_mde(t1)
 
 
@@ -62,7 +62,7 @@ cmm2d_mde <- function(dat) {
 #' @export
 #'
 #' @examples
-#' t1 <- refall2d(d = ks1985, dim1 = "degree", dim2 = "sex", status = "status", f = "freq")
+#' t1 <- refall2d(xtabs(freq ~ origin + status, data = ks1985))
 #' cmm2d_mde(t1)
 
 cmm2d_mle <- function(dat) {
@@ -125,7 +125,7 @@ cmm2d_mle <- function(dat) {
 #' @export
 #'
 #' @examples
-#' t1 <- refall2d(d = ks1985, dim1 = "degree", dim2 = "sex", status = "status", f = "freq")
+#' t1 <- refall2d(xtabs(freq ~ origin + status, data = ks1985))
 #' cmm2d_mde_ext(t1)
 
 
@@ -182,7 +182,7 @@ cmm2d_mde_ext <- function(dat) {
 #' @export
 #'
 #' @examples
-#' t1 <- refall2d(d = ks1985, dim1 = "degree", dim2 = "sex", status = "status", f = "freq")
+#' t1 <- refall2d(xtabs(freq ~ origin + status, data = ks1985))
 #' cmm2d_mde(t1)
 
 cmm2d_mle_ext <- function(dat) {

@@ -7,11 +7,11 @@
 refall2d(dat, n1 = NULL, n2 = NULL)
 }
 \arguments{
+\item{dat}{a matrix representing the outcome of a process of status allocation with two merit dimensions (or two bases for status allocation). The rows of the matrix correspond to combined categories of the merit characteristics ordered lexicographically. The rows should have names of the form 'Xi-Yj', where the symbol left of the dash indicates category of the primary characteristic and the symbol right of the dash indicates the category of the secondary characteristic}
+
 \item{n1}{the number of categories of the primary characteristic. Ignored if \code{!is.null(rownames(dat))}. Necessary if \code{is.null(rownames(dat))}}
 
 \item{n2}{the number of categories of the secondary characteristic. Ignored if \code{!is.null(rownames(dat))}. Necessary if \code{is.null(rownames(dat))}}
-
-\item{d}{a matrix representing the outcome of a process of status allocation with two merit dimensions (or two bases for status allocation). The rows of the matrix correspond to combined categories of the merit characteristics ordered lexicographically. The rows should have names of the form 'Xi-Yj', where the symbol left of the dash indicates category of the primary characteristic and the symbol right of the dash indicates the category of the secondary characteristic}
 }
 \value{
 a list with five status allocation matrices:
