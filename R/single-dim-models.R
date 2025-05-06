@@ -192,7 +192,7 @@ dmm_mde <- function(dat) {
   list(`Mixing coefficient` = as.data.frame(est_table),
        `Model-predicted allocation` = aprime,
        `Dissimilarity index` = sum(abs(prop.table(dat$Actual) - prop.table(aprime)))/2,
-       `Distance (Frobenius)` = norm(dat[[1]] - pred, type = "F")/sum(dat[[1]]),
+       `Distance (Frobenius)` = norm(dat[[1]] - aprime, type = "F")/sum(dat[[1]]),
        `Adjustment proportions` = target)
 }
 
@@ -285,6 +285,6 @@ dmm_mle <- function(dat) {
   list(`Mixing coefficient` = as.data.frame(est_table),
        `Model-predicted allocation` = aprime,
        `Dissimilarity index` = sum(abs(prop.table(dat$Actual) - prop.table(aprime)))/2,
-       `Distance (Frobenius)` = norm(dat[[1]] - pred, type = "F")/sum(dat[[1]]),
+       `Distance (Frobenius)` = norm(dat[[1]] - aprime, type = "F")/sum(dat[[1]]),
        `Adjustment proportions` = target)
   }
