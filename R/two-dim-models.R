@@ -339,9 +339,10 @@ dmm2d_mde <- function(dat) {
   # Distance
   distance <- out$value
 
-  list("Mixing coefficient" = est_table, "Adjustment proportions" = target,
-       "Dissimilarity index" = delta, "Minimised distance" = distance,
-       "Predicted counts" = pred)
+  list("Mixing coefficient" = est_table, "Predicted counts" = pred,
+       "Dissimilarity index" = delta,
+       "Distance (Frobenius)" = norm(dat[[1]] - pred, type = "F")/sum(dat[[1]]),
+       "Adjustment proportions" = target)
 }
 
 #' Two-dimensional differential mixing model with the maximum-likelihood estimation routine
@@ -451,7 +452,8 @@ dmm2d_mle <- function(dat) {
   # Distance
   distance <- out$value
 
-  list("Mixing coefficient" = est_table, "Adjustment proportions" = target,
-       "Dissimilarity index" = delta, "Minimised distance" = distance,
-       "Predicted counts" = pred)
+  list("Mixing coefficient" = est_table, "Predicted counts" = pred,
+       "Dissimilarity index" = delta,
+       "Distance (Frobenius)" = norm(dat[[1]] - pred, type = "F")/sum(dat[[1]]),
+       "Adjustment proportions" = target)
 }
