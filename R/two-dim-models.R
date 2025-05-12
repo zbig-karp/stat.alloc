@@ -271,16 +271,16 @@ dmm2d_mde <- function(dat) {
     # Adjustment proportions
     target <- rep(0, times = ncol(dat[[1]]))
     target <- (colSums(dat[[1]]) -
-                 colSums(as.double(outer(b, a)) * dat[[2]]) -
-                 colSums(as.double(outer(1 - b, a)) * dat[[3]]) -
-                 colSums(as.double(outer(b, 1 - a)) * dat[[4]]))/
+                 colSums(rep(a, each = k2) * rep(b, times = k1) * dat[[2]]) -
+                 colSums(rep(a, each = k2) * rep(1 - b, times = k1) * dat[[3]]) -
+                 colSums(rep(1 - a, each = k2) * rep(b, times = k1) * dat[[4]]))/
       sum(as.double(outer(1 - b, 1 - a)) * rowSums(dat[[5]]))
 
     # Predicted counts
-    pred <- as.double(t(outer(a, b))) * dat[[2]] +
-      as.double(t(outer(a, 1 - b))) * dat[[3]] +
-      as.double(t(outer(1 - a, b))) * dat[[4]] +
-      as.double(t(outer(1 - a, 1- b))) * outer(rowSums(dat[[5]]), target)
+    pred <- rep(a, each = k2) * rep(b, times = k1) * dat[[2]] +
+      rep(a, each = k2) * rep(1 - b, times = k1) * dat[[3]] +
+      rep(1 - a, each = k2) * rep(b, times = k1) * dat[[4]] +
+      rep(1 - a, each = k2) * rep(1 - b, times = k1) * outer(rowSums(dat[[5]]), target)
 
     # The distance from prediction to observation
     ll <- norm(pred - dat[[1]], type = "F")
@@ -311,13 +311,11 @@ dmm2d_mde <- function(dat) {
   )
 
   # Adjustment proportions
-  a <- out$par[1:k1]
-  b <- out$par[(k1 + 1):(k1 + k2)]
   target <- rep(0, times = ncol(dat[[1]]))
   target <- (colSums(dat[[1]]) -
-               colSums(as.double(outer(b, a)) * dat[[2]]) -
-               colSums(as.double(outer(1 - b, a)) * dat[[3]]) -
-               colSums(as.double(outer(b, 1 - a)) * dat[[4]]))/
+               colSums(rep(a, each = k2) * rep(b, times = k1) * dat[[2]]) -
+               colSums(rep(a, each = k2) * rep(1 - b, times = k1) * dat[[3]]) -
+               colSums(rep(1 - a, each = k2) * rep(b, times = k1) * dat[[4]]))/
     sum(as.double(outer(1 - b, 1 - a)) * rowSums(dat[[5]]))
 
 
@@ -328,10 +326,10 @@ dmm2d_mde <- function(dat) {
   )
 
   # Predicted counts
-  pred <- as.double(t(outer(a, b))) * dat[[2]] +
-    as.double(t(outer(a, 1 - b))) * dat[[3]] +
-    as.double(t(outer(1 - a, b))) * dat[[4]] +
-    as.double(t(outer(1 - a, 1- b))) * outer(rowSums(dat[[5]]), target)
+  pred <- rep(a, each = k2) * rep(b, times = k1) * dat[[2]] +
+    rep(a, each = k2) * rep(1 - b, times = k1) * dat[[3]] +
+    rep(1 - a, each = k2) * rep(b, times = k1) * dat[[4]] +
+    rep(1 - a, each = k2) * rep(1 - b, times = k1) * outer(rowSums(dat[[5]]), target)
 
   # Goodness of fit
   delta <- sum(abs(pred - dat[[1]]))/(2 * sum(dat[[1]]))
